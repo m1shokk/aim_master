@@ -2,6 +2,13 @@ import pygame
 import json
 import sys
 import os
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
+if os.name == 'nt':
+    os.system('chcp 65001 > nul')
 
 # Инициализация Pygame
 pygame.init()
@@ -12,9 +19,18 @@ screen_height = pygame.display.Info().current_h
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
 pygame.display.set_caption("Меню")
 
+
+def resource_path(relative_path):
+    """Путь к ресурсу для работы и из исходников, и из exe PyInstaller"""
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
+
 # Загрузка изображения
-preview_image = pygame.image.load('./preview_menu.png')
-preview_image = pygame.transform.scale(preview_image, (screen_width, int(screen_height)))  # Масштабируем изображение
+preview_image_path = resource_path('preview_menu.png')
+preview_image = pygame.image.load(preview_image_path)
+preview_image = pygame.transform.scale(preview_image, (screen_width, int(screen_height)))
+
 
 # Цвета
 WHITE = (255, 255, 255)
@@ -68,8 +84,8 @@ def load_settings():
     return settings
 
 def save_settings(settings):
-    with open('settings.json', 'w') as f:
-        json.dump(settings, f)
+    with open('settings.json', 'w', encoding='utf-8') as f:
+        json.dump(settings, f, ensure_ascii=False, indent=4)
 
 def open_settings():
     settings = load_settings()

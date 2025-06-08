@@ -34,6 +34,7 @@ sensitivity = 1.66
 start_time = time.time()  # Время начала игры
 game_duration = 60  # Длительность игры в секундах
 crosshair_color = WHITE  # Изначально белый цвет прицела
+last_mouse_pos = (0, 0)  # Последняя позиция мыши
 
 # Цвета для выбора курсора
 CURSOR_COLORS = {
@@ -69,16 +70,32 @@ def display_score_and_timer():
     pygame.display.flip()
 
 def display_final_stats():
-    accuracy = (score / total_shots) * 100 if total_shots > 0 else 0  # Обновленная формула точности
+    global score
+    accuracy = (score / total_shots) * 100 if total_shots > 0 else 0
     font = pygame.font.Font(None, 74)
+    small_font = pygame.font.Font(None, 50)
+    
+    # Загружаем текущий рекорд
+    settings = load_settings()
+    high_score = settings.get('high_score', 0)
+    
+    # Обновляем рекорд если текущий счет выше
+    if score > high_score:
+        high_score = score
+        settings['high_score'] = high_score
+        with open('settings.json', 'w', encoding='utf-8') as f:
+            json.dump(settings, f, ensure_ascii=False, indent=4)
+    
     screen.fill(DARK_GRAY)
     text = font.render(f"Your score: {score}", True, WHITE)
     accuracy_text = font.render(f"Accuracy: {accuracy:.2f}%", True, WHITE)
-    restart_text = font.render("Press R for restart", True, WHITE)
+    high_score_text = font.render(f"High Score: {high_score}", True, YELLOW)
+    restart_text = small_font.render("Press R for restart", True, WHITE)
     
-    screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - 50))
-    screen.blit(accuracy_text, (screen_width // 2 - accuracy_text.get_width() // 2, screen_height // 2))
-    screen.blit(restart_text, (screen_width // 2 - restart_text.get_width() // 2, screen_height // 2 + 50))
+    screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - 100))
+    screen.blit(accuracy_text, (screen_width // 2 - accuracy_text.get_width() // 2, screen_height // 2 - 20))
+    screen.blit(high_score_text, (screen_width // 2 - high_score_text.get_width() // 2, screen_height // 2 + 60))
+    screen.blit(restart_text, (screen_width // 2 - restart_text.get_width() // 2, screen_height // 2 + 140))
     
     pygame.display.flip()
     
@@ -120,19 +137,33 @@ def load_settings():
         with open('settings.json', 'r') as f:
             settings = json.load(f)
             sensitivity = settings.get('sensitivity', 1.66)
-            crosshair_color = tuple(settings.get('crosshair_color', WHITE))  # Загрузка цвета прицела
+            crosshair_color = tuple(settings.get('crosshair_color', WHITE))
+            return settings  # Возвращаем весь словарь настроек
     except FileNotFoundError:
+        settings = {
+            'sensitivity': 1.66,
+            'crosshair_color': list(WHITE),
+            'high_score': 0
+        }
         save_settings()
+        return settings
 
 # Сохранение настроек
 def save_settings():
     global sensitivity, crosshair_color
-    settings = {
+    try:
+        with open('settings.json', 'r') as f:
+            settings = json.load(f)
+    except FileNotFoundError:
+        settings = {}
+    
+    settings.update({
         'sensitivity': sensitivity,
-        'crosshair_color': list(crosshair_color)  # Сохраняем цвет прицела как список
-    }
-    with open('settings.json', 'w') as f:
-        json.dump(settings, f)
+        'crosshair_color': list(crosshair_color)
+    })
+    
+    with open('settings.json', 'w', encoding='utf-8') as f:
+        json.dump(settings, f, ensure_ascii=False, indent=4)
 
 # Основной игровой цикл
 running = True
@@ -149,8 +180,23 @@ while running:
         draw_blurred_shadow(screen, circle, circle_radius, RED, 5)  # Размытая тень
         pygame.draw.circle(screen, RED, circle, circle_radius)
     
-    # Получаем позицию курсора
+    # Получаем позицию курсора и применяем чувствительность
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    mouse_rel_x, mouse_rel_y = pygame.mouse.get_rel()
+    
+    # Применяем чувствительность к движению мыши
+    if mouse_rel_x != 0 or mouse_rel_y != 0:
+        mouse_x = last_mouse_pos[0] + (mouse_rel_x * sensitivity)
+        mouse_y = last_mouse_pos[1] + (mouse_rel_y * sensitivity)
+        
+        # Ограничиваем движение мыши пределами экрана
+        mouse_x = max(0, min(screen_width, mouse_x))
+        mouse_y = max(0, min(screen_height, mouse_y))
+        
+        # Обновляем позицию мыши
+        pygame.mouse.set_pos(int(mouse_x), int(mouse_y))
+    
+    last_mouse_pos = (mouse_x, mouse_y)
     
     # Рисование размытой тени
     draw_blurred_shadow(screen, (mouse_x, mouse_y), radius=4, shadow_color=crosshair_color, blur_intensity=6)
