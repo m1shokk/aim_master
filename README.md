@@ -35,10 +35,13 @@ This will launch the main menu window.
 ## Screenshots
 
 ### Main Menu
-"Place your screenshot of the main menu here"
+![image](https://github.com/user-attachments/assets/e80cffd6-d1b0-4b7f-9c9d-3921e535a79f)
+
 
 ### Aim Trainer Game
-"Place your screenshot of the aim trainer game here"
+![image](https://github.com/user-attachments/assets/a7dabcb5-45cf-4ef2-a054-d71c46013e2e)
+![image](https://github.com/user-attachments/assets/e5aaab99-32af-4f7d-83a2-709a10635b6c)
+
 
 ---
 
