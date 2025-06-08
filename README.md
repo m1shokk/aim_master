@@ -37,10 +37,12 @@ This will launch the main menu window.
 ### Main Menu
 ![image](https://github.com/user-attachments/assets/e80cffd6-d1b0-4b7f-9c9d-3921e535a79f)
 
+![image](https://github.com/user-attachments/assets/52d34dad-6c75-47c9-b614-24b8abdefd25)
+
 
 ### Aim Trainer Game
-![image](https://github.com/user-attachments/assets/a7dabcb5-45cf-4ef2-a054-d71c46013e2e)
-![image](https://github.com/user-attachments/assets/e5aaab99-32af-4f7d-83a2-709a10635b6c)
+![image](https://github.com/user-attachments/assets/7fbaf12b-4786-4011-8c8e-fa29191ad93d)
+
 
 
 ---
