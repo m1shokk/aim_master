@@ -33,10 +33,10 @@ A modern, stylish training app for improving your aim, tracking, and reaction sp
 - All results and settings are saved in `settings.json`.
 
 ## How to Play
-1. Run `menu.py` to start the main menu.
+1. Run `main.py` to start the main menu.
 2. Choose your mode and settings.
 3. Use your mouse to play each mode as described above.
-4. Press `ESC` to return to the menu, `R` to restart, and `?` to end a match early (where available).
+4. Press `ESC` to return to the menu, `R` to restart.
 
 ---
 
@@ -51,9 +51,9 @@ A modern, stylish training app for improving your aim, tracking, and reaction sp
 - **Stress Aim:** Быстро кликайте по красным шарам, избегайте розовых. 5 раундов, победа — если не ошиблись.
 
 ## Инструкции:
-- Запустите `menu.py`.
+- Запустите `main.py`.
 - Выберите режим и настройки.
 - Управляйте мышкой, следуйте подсказкам на экране.
-- `ESC` — меню, `R` — рестарт, `?` — досрочно завершить матч (если доступно).
+- `ESC` — меню, `R` — рестарт.
 
 Удачи в тренировках! 
