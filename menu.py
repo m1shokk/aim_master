@@ -43,6 +43,7 @@ BLUE = (0, 0, 255)
 PURPLE = (128, 0, 128)
 ORANGE = (255, 165, 0)
 GRAY = (200, 200, 200)
+VILALA = (120, 105, 255)
 
 # Шрифты
 font = pygame.font.Font(None, 74)
@@ -62,7 +63,7 @@ def draw_button(text, x, y, width, height, action=None):
     
     # Проверка наведения мыши
     if button_rect.collidepoint((mouse_x, mouse_y)):
-        color = YELLOW  # Подсветка желтым цветом при наведении
+        color = VILALA  # Подсветка желтым цветом при наведении
         pygame.draw.rect(screen, color, button_rect, border_radius=15)  # Яркая подсветка при наведении
         # Обработка клика
         if pygame.mouse.get_pressed()[0]:  # Проверка нажатия кнопки мыши
@@ -240,15 +241,7 @@ def draw_blurred_shadow(surface, pos, radius, shadow_color, blur_intensity):
     surface.blit(shadow_surface, (pos[0] - radius * 2, pos[1] - radius * 2))
 
 def start_game():
-    settings = load_settings()
-    difficulty = settings.get('difficulty', 'medium')
-    if difficulty == 'easy':
-        filename = 'aim_sec_easy.py'
-    elif difficulty == 'hard':
-        filename = 'aim_sec_hard.py'
-    else:
-        filename = 'aim_sec.py'
-    os.execv(sys.executable, ['python'] + [filename])
+    os.execv(sys.executable, ['python'] + ['aim_sec.py'])
 
 def start_game_select():
     os.execv(sys.executable, ['python'] + ['game_select.py'])

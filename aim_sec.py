@@ -16,10 +16,10 @@ pygame.display.set_caption("Aim Master (Ch0kz Games)")
 
 # Цвета
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-DARK_GRAY = (50, 50, 50)
+RED = (255, 80, 80)
+DARK_GRAY = (40, 40, 50)
 BLACK = (0, 0, 0)
-GRID_COLOR = (100, 100, 100)  # Цвет сетки
+GRID_COLOR = (60, 60, 70)  # Цвет сетки
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
@@ -28,11 +28,10 @@ PURPLE = (128, 0, 128)
 # Переменные игры   
 score = 0
 total_shots = 0  # Общее количество выстрелов
-circle_radius = 20
 circles = []
 sensitivity = 1.66
 start_time = time.time()  # Время начала игры
-game_duration = 60  # Длительность игры в секундах
+game_duration = 10  # Длительность игры в секундах
 crosshair_color = WHITE  # Изначально белый цвет прицела
 last_mouse_pos = (0, 0)  # Последняя позиция мыши
 
@@ -72,35 +71,53 @@ def display_score_and_timer():
 def display_final_stats():
     global score
     accuracy = (score / total_shots) * 100 if total_shots > 0 else 0
-    font = pygame.font.Font(None, 74)
-    small_font = pygame.font.Font(None, 50)
-    
-    # Загружаем текущий рекорд
+    font = pygame.font.Font(None, 80)
+    small_font = pygame.font.Font(None, 48)
     settings = load_settings()
     high_score = settings.get('high_score', 0)
-    
-    # Обновляем рекорд если текущий счет выше
     if score > high_score:
         high_score = score
         settings['high_score'] = high_score
         with open('settings.json', 'w', encoding='utf-8') as f:
             json.dump(settings, f, ensure_ascii=False, indent=4)
-    
     screen.fill(DARK_GRAY)
-    text = font.render(f"Your score: {score}", True, WHITE)
-    accuracy_text = font.render(f"Accuracy: {accuracy:.2f}%", True, WHITE)
-    high_score_text = font.render(f"High Score: {high_score}", True, YELLOW)
-    difficulty_text = small_font.render("Difficulty: Medium", True, WHITE)
-    restart_text = small_font.render("Press R for restart", True, WHITE)
-    
-    screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - 120))
-    screen.blit(accuracy_text, (screen_width // 2 - accuracy_text.get_width() // 2, screen_height // 2 - 40))
-    screen.blit(high_score_text, (screen_width // 2 - high_score_text.get_width() // 2, screen_height // 2 + 40))
-    screen.blit(difficulty_text, (screen_width // 2 - difficulty_text.get_width() // 2, screen_height // 2 + 100))
-    screen.blit(restart_text, (screen_width // 2 - restart_text.get_width() // 2, screen_height // 2 + 160))
-    
+    draw_grid()
+    # Цвета для сложности
+    difficulty = settings.get('difficulty', 'medium')
+    difficulty_display = difficulty.capitalize()
+    if difficulty_display == 'Medium':
+        diff_color = (252, 213, 104)
+    elif difficulty_display == 'Easy':
+        diff_color = (0, 200, 120)
+    else:
+        diff_color = (255, 80, 80)
+    # Тексты
+    title = font.render("Aim Results", True, (220, 220, 255))
+    score_text = font.render(f"Score: {score}", True, (255,255,255))
+    accuracy_text = small_font.render(f"Accuracy:", True, (200,200,200))
+    accuracy_val = small_font.render(f"{accuracy:.2f}%", True, (0, 200, 120) if accuracy >= 70 else (255, 80, 80))
+    high_score_text = small_font.render(f"High Score:", True, (200,200,200))
+    high_score_val = small_font.render(f"{high_score}", True, (252, 213, 104))
+    diff_label = small_font.render("Difficulty:", True, (255,255,255))
+    diff_val = small_font.render(difficulty_display, True, diff_color)
+    restart_text = small_font.render("Press R for restart", True, (180,180,200))
+    # Рисуем всё красиво по центру
+    y = screen_height//2 - 180
+    screen.blit(title, (screen_width//2 - title.get_width()//2, y))
+    y += 80
+    screen.blit(score_text, (screen_width//2 - score_text.get_width()//2, y))
+    y += 70
+    screen.blit(accuracy_text, (screen_width//2 - 180, y))
+    screen.blit(accuracy_val, (screen_width//2 + 40, y))
+    y += 50
+    screen.blit(high_score_text, (screen_width//2 - 180, y))
+    screen.blit(high_score_val, (screen_width//2 + 40, y))
+    y += 50
+    screen.blit(diff_label, (screen_width//2 - 180, y))
+    screen.blit(diff_val, (screen_width//2 + 40, y))
+    y += 80
+    screen.blit(restart_text, (screen_width//2 - restart_text.get_width()//2, y))
     pygame.display.flip()
-    
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -110,6 +127,7 @@ def display_final_stats():
                 if event.key == pygame.K_r:
                     reset_game()
                     waiting = False
+                    return
 
 def reset_game():
     global score, total_shots, circles, start_time
@@ -171,6 +189,22 @@ def save_settings():
 running = True
 paused = False
 load_settings()  # Загрузка настроек при запуске игры
+settings = load_settings()
+difficulty = settings.get('difficulty', 'medium')
+difficulty_display = difficulty.capitalize()
+if difficulty_display == 'Medium':
+    diff_color = (252, 213, 104)  # желтый
+elif difficulty_display == 'Easy':
+    diff_color = (0, 200, 120)  # зеленый
+else:
+    diff_color = (255, 80, 80)  # красный
+if difficulty == 'easy':
+    circle_radius = 32
+elif difficulty == 'hard':
+    circle_radius = 14
+else:
+    circle_radius = 20
+
 while running:
     screen.fill(DARK_GRAY)
     draw_grid()  # Рисуем сетку

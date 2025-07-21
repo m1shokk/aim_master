@@ -99,15 +99,7 @@ def save_settings(settings):
         json.dump(settings, f, ensure_ascii=False, indent=4)
 
 def start_aim_training():
-    settings = load_settings()
-    difficulty = settings.get('difficulty', 'medium')
-    if difficulty == 'easy':
-        filename = 'aim_sec_easy.py'
-    elif difficulty == 'hard':
-        filename = 'aim_sec_hard.py'
-    else:
-        filename = 'aim_sec.py'
-    os.execv(sys.executable, ['python'] + [filename])
+    os.execv(sys.executable, ['python'] + ['aim_sec.py'])
 
 def start_reaction_test():
     os.execv(sys.executable, ['python'] + ['reaction_sec.py'])
