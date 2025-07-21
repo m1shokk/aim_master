@@ -12,7 +12,7 @@ pygame.init()
 screen_width = pygame.display.Info().current_w
 screen_height = pygame.display.Info().current_h
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-pygame.display.set_caption("Aim Master (Ch0kz Games)")
+pygame.display.set_caption("Aim Master - Hard Mode (Ch0kz Games)")
 
 # Цвета
 WHITE = (255, 255, 255)
@@ -28,7 +28,7 @@ PURPLE = (128, 0, 128)
 # Переменные игры   
 score = 0
 total_shots = 0  # Общее количество выстрелов
-circle_radius = 20
+circle_radius = 12  # Меньший радиус для сложного режима
 circles = []
 sensitivity = 1.66
 start_time = time.time()  # Время начала игры
@@ -77,12 +77,12 @@ def display_final_stats():
     
     # Загружаем текущий рекорд
     settings = load_settings()
-    high_score = settings.get('high_score', 0)
+    high_score = settings.get('high_score_hard', 0)  # Отдельный рекорд для сложного режима
     
     # Обновляем рекорд если текущий счет выше
     if score > high_score:
         high_score = score
-        settings['high_score'] = high_score
+        settings['high_score_hard'] = high_score
         with open('settings.json', 'w', encoding='utf-8') as f:
             json.dump(settings, f, ensure_ascii=False, indent=4)
     
@@ -90,7 +90,7 @@ def display_final_stats():
     text = font.render(f"Your score: {score}", True, WHITE)
     accuracy_text = font.render(f"Accuracy: {accuracy:.2f}%", True, WHITE)
     high_score_text = font.render(f"High Score: {high_score}", True, YELLOW)
-    difficulty_text = small_font.render("Difficulty: Medium", True, WHITE)
+    difficulty_text = small_font.render("Difficulty: Hard", True, WHITE)
     restart_text = small_font.render("Press R for restart", True, WHITE)
     
     screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - 120))
@@ -145,7 +145,7 @@ def load_settings():
         settings = {
             'sensitivity': 1.66,
             'crosshair_color': list(WHITE),
-            'high_score': 0
+            'high_score_hard': 0
         }
         save_settings()
         return settings
@@ -201,7 +201,7 @@ while running:
     last_mouse_pos = (mouse_x, mouse_y)
     
     # Рисование размытой тени
-    draw_blurred_shadow(screen, (mouse_x, mouse_y), 4, crosshair_color, 6)
+    draw_blurred_shadow(screen, (mouse_x, mouse_y), radius=4, shadow_color=crosshair_color, blur_intensity=6)
 
     # Рисуем прицел
     pygame.draw.circle(screen, crosshair_color, (mouse_x, mouse_y), 7)  # Белый кружочек
@@ -212,7 +212,7 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                # Запускаем menu.py и закрываем aim_sec.py
+                # Запускаем menu.py и закрываем aim_sec_hard.py
                 os.execv(sys.executable, ['python'] + ['menu.py'])
             elif event.key == pygame.K_r:
                 reset_game()
@@ -237,4 +237,4 @@ while running:
     display_score_and_timer()
 
 # Завершение игры
-pygame.quit()
+pygame.quit() 

@@ -1,9 +1,14 @@
 {
-    "sensitivity": 1.66,
+    "sensitivity": 1.6800000000000002,
     "crosshair_color": [
-        0,
+        255,
         255,
         0
     ],
-    "high_score": 0
+    "high_score": 84,
+    "high_score_easy": 100,
+    "difficulty": "medium",
+    "high_score_hard": 61,
+    "high_score_reaction": 13,
+    "stress_ball_lifetime": 2.5
 }
