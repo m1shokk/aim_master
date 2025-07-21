@@ -94,62 +94,98 @@ def open_settings():
     difficulty = settings.get('difficulty', 'medium')
     settings_running = True
     dragging_slider = False
+    # Цвета и параметры для красивого дизайна
+    BG_COLOR = (40, 40, 50)
+    BLOCK_COLOR1 = (60, 60, 80)
+    BLOCK_COLOR2 = (30, 30, 40)
+    BUTTON_GRAD1 = (0, 180, 255)
+    BUTTON_GRAD2 = (0, 120, 255)
+    BUTTON_RADIUS = 28
+    BUTTON_MARGIN = 30
+    HOVER_SCALE = 1.08
+    ANIMATION_SPEED = 0.15
+    # Для анимации наведения
+    hover_states = [0.0, 0.0, 0.0]
     while settings_running:
-        screen.fill(DARK_GRAY)
-
-        # Кнопка назад
-        draw_button("Back", screen_width // 2 - BUTTON_WIDTH // 2, screen_height // 2 + 200, BUTTON_WIDTH, BUTTON_HEIGHT, lambda: None)
-
-        # Чувствительность
-        sensitivity_text = small_font.render(f"Sensitivity: {slider_value:.2f}", True, WHITE)
-        screen.blit(sensitivity_text, (screen_width // 2 - sensitivity_text.get_width() // 2, screen_height // 2 - 50))
-        pygame.draw.rect(screen, WHITE, (screen_width // 2 - 100, screen_height // 2, 200, 10))
-        pygame.draw.rect(screen, ORANGE, (screen_width // 2 - 100 + int((slider_value - 0.1) / 7.9 * 200), screen_height // 2 - 5, 10, 20))
-
-        # Цвет курсора
-        crosshair_color_block_x = screen_width // 2 - 150
-        crosshair_color_block_y = screen_height // 2 + 50
-        block_width = 300
-        block_height = 150
-        block_border_radius = 20
-        pygame.draw.rect(screen, DARK_GRAY, (crosshair_color_block_x, crosshair_color_block_y, block_width, block_height), border_radius=block_border_radius)
+        screen.fill(BG_COLOR)
+        # Заголовок
+        title_font = pygame.font.Font(None, 80)
+        title_text = title_font.render("Settings", True, (220, 220, 255))
+        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 60))
+        # --- Sensitivity Block ---
+        block_rect = pygame.Rect(screen_width//2-220, 170, 440, 90)
+        pygame.draw.rect(screen, BLOCK_COLOR1, block_rect, border_radius=30)
+        sens_label = small_font.render(f"Sensitivity: {slider_value:.2f}", True, WHITE)
+        screen.blit(sens_label, (block_rect.centerx - sens_label.get_width()//2, block_rect.y+10))
+        # Красивая полоска
+        pygame.draw.rect(screen, (80, 80, 120), (block_rect.x+40, block_rect.y+50, 320, 12), border_radius=8)
+        fill_w = int((slider_value-0.1)/7.9*320)
+        pygame.draw.rect(screen, (0, 180, 255), (block_rect.x+40, block_rect.y+50, fill_w, 12), border_radius=8)
+        # Кружок-ползунок
+        slider_x = block_rect.x+40+fill_w
+        pygame.draw.circle(screen, (0, 180, 255), (slider_x, block_rect.y+56), 16)
+        # --- Crosshair Color Block ---
+        color_block_rect = pygame.Rect(screen_width//2-220, 280, 440, 110)
+        pygame.draw.rect(screen, BLOCK_COLOR1, color_block_rect, border_radius=30)
         label = small_font.render("Crosshair Color", True, WHITE)
-        screen.blit(label, (crosshair_color_block_x + (block_width - label.get_width()) // 2, crosshair_color_block_y + 10))
+        screen.blit(label, (color_block_rect.centerx - label.get_width()//2, color_block_rect.y+10))
         colors = [WHITE, RED, YELLOW, GREEN, BLUE, PURPLE]
         for i, color in enumerate(colors):
-            color_x = crosshair_color_block_x + (i % 3) * 100 + 25
-            color_y = crosshair_color_block_y + (i // 3) * 50 + 40
-            pygame.draw.rect(screen, color, (color_x, color_y, 50, 50))
+            color_x = color_block_rect.x + 40 + i*60
+            color_y = color_block_rect.y + 50
+            pygame.draw.circle(screen, color, (color_x, color_y), 22)
             if crosshair_color == color:
-                pygame.draw.rect(screen, BLACK, (color_x, color_y, 50, 50), 5)
-
-        # --- Выбор сложности ---
-        diff_block_x = screen_width // 2 - 200
-        diff_block_y = screen_height // 2 - 150
-        diff_block_w = 400
-        diff_block_h = 60
-        pygame.draw.rect(screen, DARK_GRAY, (diff_block_x, diff_block_y, diff_block_w, diff_block_h), border_radius=20)
+                pygame.draw.circle(screen, (0, 180, 255), (color_x, color_y), 26, 3)
+        # --- Difficulty Block ---
+        diff_block_rect = pygame.Rect(screen_width//2-220, 410, 440, 90)
+        pygame.draw.rect(screen, BLOCK_COLOR1, diff_block_rect, border_radius=30)
         diff_label = small_font.render("Difficulty:", True, WHITE)
-        screen.blit(diff_label, (diff_block_x + 10, diff_block_y + 15))
-        # Кнопки сложности
+        screen.blit(diff_label, (diff_block_rect.x+30, diff_block_rect.y+15))
         diff_names = ["easy", "medium", "hard"]
         for i, name in enumerate(diff_names):
-            btn_x = diff_block_x + 120 + i * 90
-            btn_y = diff_block_y + 10
+            btn_x = diff_block_rect.x+160+i*90
+            btn_y = diff_block_rect.y+20
             btn_w = 80
-            btn_h = 40
-            color = YELLOW if difficulty == name else GRAY
-            pygame.draw.rect(screen, color, (btn_x, btn_y, btn_w, btn_h), border_radius=10)
-            txt = small_font.render(name.capitalize(), True, BLACK if difficulty == name else WHITE)
-            screen.blit(txt, (btn_x + (btn_w - txt.get_width()) // 2, btn_y + (btn_h - txt.get_height()) // 2))
-
-        # Курсор (оптимизированная версия)
+            btn_h = 50
+            # Градиентная кнопка
+            grad_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+            for y in range(btn_h):
+                ratio = y/btn_h
+                r = int(BUTTON_GRAD1[0]*(1-ratio)+BUTTON_GRAD2[0]*ratio)
+                g = int(BUTTON_GRAD1[1]*(1-ratio)+BUTTON_GRAD2[1]*ratio)
+                b = int(BUTTON_GRAD1[2]*(1-ratio)+BUTTON_GRAD2[2]*ratio)
+                pygame.draw.line(grad_surf, (r,g,b), (0,y), (btn_w,y))
+            scale = 1.0 + (HOVER_SCALE-1.0)*hover_states[i]
+            sw, sh = int(btn_w*scale), int(btn_h*scale)
+            btn_rect = pygame.Rect(btn_x+btn_w//2-sw//2, btn_y+btn_h//2-sh//2, sw, sh)
+            screen.blit(grad_surf, btn_rect.topleft)
+            pygame.draw.rect(screen, (0,0,0,40), btn_rect, 2, border_radius=18)
+            txt = small_font.render(name.capitalize(), True, WHITE if difficulty==name else (180,180,200))
+            screen.blit(txt, (btn_rect.centerx-txt.get_width()//2, btn_rect.centery-txt.get_height()//2))
+            # Анимация наведения
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if btn_rect.collidepoint((mouse_x, mouse_y)):
+                hover_states[i] = min(1.0, hover_states[i]+ANIMATION_SPEED)
+            else:
+                hover_states[i] = max(0.0, hover_states[i]-ANIMATION_SPEED)
+        # --- Back Button ---
+        back_rect = pygame.Rect(screen_width//2-100, screen_height-120, 200, 60)
+        grad_surf = pygame.Surface((200, 60), pygame.SRCALPHA)
+        for y in range(60):
+            ratio = y/60
+            r = int(120*(1-ratio)+80*ratio)
+            g = int(120*(1-ratio)+80*ratio)
+            b = int(120*(1-ratio)+80*ratio)
+            pygame.draw.line(grad_surf, (r,g,b), (0,y), (200,y))
+        screen.blit(grad_surf, back_rect.topleft)
+        pygame.draw.rect(screen, (0,0,0,40), back_rect, 2, border_radius=22)
+        back_txt = small_font.render("Back", True, WHITE)
+        screen.blit(back_txt, (back_rect.centerx-back_txt.get_width()//2, back_rect.centery-back_txt.get_height()//2))
+        # Курсор
         pygame.mouse.set_visible(False)
         mouse_x, mouse_y = pygame.mouse.get_pos()
         pygame.draw.circle(screen, settings['crosshair_color'], (mouse_x, mouse_y), 5)
-
         pygame.display.flip()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 settings_running = False
@@ -158,32 +194,38 @@ def open_settings():
                     settings_running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Back
-                if screen_width // 2 - BUTTON_WIDTH // 2 < event.pos[0] < screen_width // 2 + BUTTON_WIDTH // 2 and screen_height // 2 + 200 < event.pos[1] < screen_height // 2 + 200 + BUTTON_HEIGHT:
+                if back_rect.collidepoint(event.pos):
                     settings_running = False
                 # Цвет
                 for i, color in enumerate(colors):
-                    if crosshair_color_block_x + (i % 3) * 100 + 25 < event.pos[0] < crosshair_color_block_x + (i % 3) * 100 + 25 + 50 and crosshair_color_block_y + (i // 3) * 50 + 40 < event.pos[1] < crosshair_color_block_y + (i // 3) * 50 + 40 + 50:
+                    color_x = color_block_rect.x + 40 + i*60
+                    color_y = color_block_rect.y + 50
+                    if (event.pos[0]-color_x)**2 + (event.pos[1]-color_y)**2 <= 22**2:
                         settings['crosshair_color'] = color
                         save_settings(settings)
+                        crosshair_color = color
                         break
                 # Ползунок чувствительности
-                if screen_width // 2 - 100 < event.pos[0] < screen_width // 2 + 100 and screen_height // 2 - 5 < event.pos[1] < screen_height // 2 + 5:
+                if block_rect.x+40-16 < event.pos[0] < block_rect.x+40+320+16 and block_rect.y+50-16 < event.pos[1] < block_rect.y+50+16:
                     dragging_slider = True
                 # Кнопки сложности
                 for i, name in enumerate(diff_names):
-                    btn_x = diff_block_x + 120 + i * 90
-                    btn_y = diff_block_y + 10
+                    btn_x = diff_block_rect.x+160+i*90
+                    btn_y = diff_block_rect.y+20
                     btn_w = 80
-                    btn_h = 40
-                    if btn_x < event.pos[0] < btn_x + btn_w and btn_y < event.pos[1] < btn_y + btn_h:
+                    btn_h = 50
+                    scale = 1.0 + (HOVER_SCALE-1.0)*hover_states[i]
+                    sw, sh = int(btn_w*scale), int(btn_h*scale)
+                    btn_rect = pygame.Rect(btn_x+btn_w//2-sw//2, btn_y+btn_h//2-sh//2, sw, sh)
+                    if btn_rect.collidepoint(event.pos):
                         difficulty = name
                         settings['difficulty'] = name
                         save_settings(settings)
             elif event.type == pygame.MOUSEBUTTONUP:
                 dragging_slider = False
             if event.type == pygame.MOUSEMOTION and dragging_slider:
-                if screen_width // 2 - 100 < event.pos[0] < screen_width // 2 + 100 and screen_height // 2 - 5 < event.pos[1] < screen_height // 2 + 5:
-                    slider_value = max(0.1, min(8.0, (event.pos[0] - (screen_width // 2 - 100)) / 200 * 7.9 + 0.1))
+                if block_rect.x+40-16 < event.pos[0] < block_rect.x+40+320+16 and block_rect.y+50-16 < event.pos[1] < block_rect.y+50+16:
+                    slider_value = max(0.1, min(8.0, (event.pos[0] - (block_rect.x+40)) / 320 * 7.9 + 0.1))
                     settings['sensitivity'] = slider_value
                     save_settings(settings)
 

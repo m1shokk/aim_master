@@ -16,12 +16,12 @@ pygame.display.set_caption("Reaction Speed Test (Ch0kz Games)")
 
 # Цвета
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+RED = (255, 80, 80)
+GREEN = (0, 200, 120)
 DARK_GRAY = (40, 40, 50)
 BLACK = (0, 0, 0)
 GRID_COLOR = (60, 60, 70)
-YELLOW = (255, 255, 0)
+YELLOW = (252, 213, 104)
 BLUE = (0, 120, 255)
 PURPLE = (128, 0, 128)
 GRAY = (180, 180, 200)
@@ -77,7 +77,7 @@ def display_attempts_and_stats():
     # Лучшее время реакции
     if reaction_times:
         best_reaction = min(reaction_times)
-        best_text = small_font.render(f"Best: {best_reaction:.3f}s", True, YELLOW)
+        best_text = small_font.render(f"Best: {best_reaction:.3f}s", True, GREEN)
         screen.blit(best_text, (10, 120))
 
 def display_final_stats():
@@ -86,13 +86,13 @@ def display_final_stats():
     screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, screen_height // 2 - 120))
     if reaction_times:
         avg_reaction = sum(reaction_times) / len(reaction_times)
-        avg_text = font.render(f"Average Reaction: {avg_reaction:.3f}s", True, WHITE)
+        avg_text = font.render(f"Average Reaction: {avg_reaction:.3f}s", True, YELLOW)
         screen.blit(avg_text, (screen_width // 2 - avg_text.get_width() // 2, screen_height // 2 - 40))
         best_reaction = min(reaction_times)
         best_text = font.render(f"Best Reaction: {best_reaction:.3f}s", True, GREEN)
         screen.blit(best_text, (screen_width // 2 - best_text.get_width() // 2, screen_height // 2 + 20))
         worst_reaction = max(reaction_times)
-        worst_text = font.render(f"Worst Reaction: {worst_reaction:.3f}s", True, WHITE)
+        worst_text = font.render(f"Worst Reaction: {worst_reaction:.3f}s", True, RED)
         screen.blit(worst_text, (screen_width // 2 - worst_text.get_width() // 2, screen_height // 2 + 80))
     restart_text = small_font.render("Press R for restart", True, WHITE)
     screen.blit(restart_text, (screen_width // 2 - restart_text.get_width() // 2, screen_height // 2 + 160))
